@@ -1,0 +1,26 @@
+{
+    "name": "projeto_webservices",
+    "version": "1.0.0",
+    "description": "Projeto de Web Services com Express.js",
+    "main": "src/app.js",
+    "scripts": {
+        "start": "node src/app.js",
+        "dev": "nodemon src/app.js"
+    },
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "body-parser": "^1.20.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "jsonwebtoken": "^9.0.0",
+        "mysql2": "^3.11.5"
+    },
+    "devDependencies": {
+        "eslint": "^8.48.0",
+        "nodemon": "^3.0.1"
+    },
+    "keywords": [],
+    "author": "Teu Nome",
+    "license": "ISC"
+}

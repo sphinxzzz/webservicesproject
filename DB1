@@ -1,0 +1,38 @@
+USE webservices;
+
+-- Inserir dados na tabela Users
+INSERT INTO Users (name, email, password_hash, role, is_azorean)
+VALUES 
+    ('João Silva', 'joao.silva@example.com', 'hashed_password_123', 'user', TRUE),
+    ('Maria Costa', 'maria.costa@example.com', 'hashed_password_456', 'manager', FALSE),
+    ('Carlos Dias', 'carlos.dias@example.com', 'hashed_password_789', 'user', TRUE);
+
+-- Inserir dados na tabela Hostels
+INSERT INTO Hostels (name, location, max_guests)
+VALUES 
+    ('Azores Paradise', 'São Miguel', 20),
+    ('Pico Adventure', 'Pico', 10),
+    ('Graciosa Getaway', 'Graciosa', 8);
+
+-- Inserir dados na tabela Rooms
+INSERT INTO Rooms (hostel_id, room_type, is_available)
+VALUES 
+    (1, 'dormitory', TRUE),
+    (1, 'suite', FALSE),
+    (2, 'single', TRUE),
+    (2, 'dormitory', TRUE),
+    (3, 'suite', TRUE);
+
+-- Inserir dados na tabela Reservations
+INSERT INTO Reservations (user_id, room_id, reservation_date, is_discount_applied, total_price)
+VALUES 
+    (1, 1, '2024-12-20', FALSE, 100.00),
+    (2, 2, '2024-12-25', TRUE, 85.50),
+    (3, 3, '2024-12-28', FALSE, 120.00);
+
+-- Inserir dados na tabela Reviews
+INSERT INTO Reviews (user_id, hostel_id, rating, comment)
+VALUES 
+    (1, 1, 5, 'A estadia foi incrível! Recomendo muito este hostel.'),
+    (2, 2, 4, 'Boa experiência, mas a limpeza poderia ser melhor.'),
+    (3, 3, 3, 'Quarto confortável, mas esperava mais pelo preço.');

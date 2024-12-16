@@ -26,6 +26,7 @@ const startServer = async () => {
         const reviewRoutes = require('./routes/reviews');
         const reservationRoutes = require('./routes/reservations');
         const roomRoutes = require('./routes/rooms');
+        
 
         // Usar as rotas
         app.use('/users', userRoutes);
@@ -33,6 +34,7 @@ const startServer = async () => {
         app.use('/reviews', reviewRoutes);
         app.use('/reservations', reservationRoutes);
         app.use('/rooms', roomRoutes);
+        
 
         // Endpoint para testar a conexão à base de dados
         app.get('/db-test', async (req, res) => {

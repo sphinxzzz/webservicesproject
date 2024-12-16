@@ -1,66 +1,61 @@
 USE webservices;
 
--- Tabela de utilizadores
-CREATE TABLE Users (
-    user_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
+-- Tabela Hostels
+CREATE TABLE hostels (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    capacity INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Tabela Quartos
+CREATE TABLE rooms (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    hostel_id INT NOT NULL,
+    type ENUM('dormitory', 'single', 'suite') NOT NULL,
+    price_per_night DECIMAL(10, 2) NOT NULL,
+    is_available BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (hostel_id) REFERENCES hostels(id) ON DELETE CASCADE
+);
+
+-- Tabela Utilizadores
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('user', 'manager') DEFAULT 'user',
-    is_azorean BOOLEAN DEFAULT FALSE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+    is_manager BOOLEAN DEFAULT FALSE,
+    is_azores_resident BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Tabela de hostels
-CREATE TABLE Hostels (
-    hostel_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    location ENUM(
-        'São Miguel', 'Terceira', 'Faial', 'Pico', 
-        'São Jorge', 'Santa Maria', 'Graciosa', 
-        'Flores', 'Corvo'
-    ) NOT NULL,
-    max_guests INT NOT NULL CHECK (max_guests > 0),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+-- Tabela Reservas
+CREATE TABLE reservations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    room_id INT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE,
+    CONSTRAINT chk_dates CHECK (start_date < end_date)
 );
 
--- Tabela de quartos
-CREATE TABLE Rooms (
-    room_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    hostel_id INT UNSIGNED NOT NULL,
-    room_type ENUM('dormitory', 'single', 'suite') NOT NULL,
-    is_available BOOLEAN DEFAULT TRUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT fk_hostel_room FOREIGN KEY (hostel_id) REFERENCES Hostels(hostel_id) ON DELETE CASCADE
-);
-
--- Tabela de reservas
-CREATE TABLE Reservations (
-    reservation_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED NOT NULL,
-    room_id INT UNSIGNED NOT NULL,
-    reservation_date DATE NOT NULL,
-    is_discount_applied BOOLEAN DEFAULT FALSE NOT NULL,
-    total_price DECIMAL(10, 2) NOT NULL CHECK (total_price >= 0),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT fk_user_reservation FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-    CONSTRAINT fk_room_reservation FOREIGN KEY (room_id) REFERENCES Rooms(room_id) ON DELETE CASCADE
-);
-
--- Tabela de avaliações
-CREATE TABLE Reviews (
-    review_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNSIGNED,
-    hostel_id INT UNSIGNED NOT NULL,
-    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+-- Tabela Avaliações
+CREATE TABLE reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    hostel_id INT NOT NULL,
+    rating INT CHECK (rating BETWEEN 1 AND 5),
     comment TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT fk_user_review FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE SET NULL,
-    CONSTRAINT fk_hostel_review FOREIGN KEY (hostel_id) REFERENCES Hostels(hostel_id) ON DELETE CASCADE
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (hostel_id) REFERENCES hostels(id) ON DELETE CASCADE
 );
-
--- Índices para otimizar buscas
-CREATE INDEX idx_hostel_location ON Hostels(location);
-CREATE INDEX idx_room_availability ON Rooms(is_available);
-CREATE INDEX idx_user_role ON Users(role);
-CREATE INDEX idx_review_rating ON Reviews(rating);

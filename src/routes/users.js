@@ -67,4 +67,52 @@ router.get("/search/:name", async (req, res) => {
   }
 });
 
+// Endpoint para criar um novo utilizador
+router.post("/", async (req, res) => {
+  try {
+    const { name, email, password_hash, is_manager, is_azores_resident } = req.body;
+
+    // Validação simples dos dados obrigatórios
+    if (!name || !email || !password_hash) {
+      return res.status(400).json({
+        success: false,
+        message: "Nome, email e senha são obrigatórios!",
+      });
+    }
+
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    });
+
+    // Inserir o novo utilizador no banco de dados
+    const [result] = await connection.query(
+      "INSERT INTO users (name, email, password_hash, is_manager, is_azores_resident) VALUES (?, ?, ?, ?, ?)",
+      [name, email, password_hash, is_manager || false, is_azores_resident || false]
+    );
+    await connection.end();
+
+    res.status(201).json({
+      success: true,
+      message: "Novo utilizador criado com sucesso!",
+      data: {
+        id: result.insertId,
+        name,
+        email,
+        is_manager,
+        is_azores_resident,
+      },
+    });
+  } catch (err) {
+    console.error("Erro ao criar novo utilizador:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Erro ao criar novo utilizador.",
+      error: err.message,
+    });
+  }
+});
+
 module.exports = router;
